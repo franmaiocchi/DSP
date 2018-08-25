@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 """
 Created on Wed Aug 22 19:58:09 2018
-
-@author: Francisco
+TP1
+Procesamiento Digital de Señales
+Francisco Maiocchi
+UTN FRBA 2018
 """
-
+#%%  Importacion de librerias
 import numpy as np
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+#%%  Funciones requeridas
 def generador_senoidal (fs, f0, N, a0=1, p0=0):
-    """ 
-    
+    """   
     brief:  Generador de señales senoidal, con argumentos
     
     fs:     frecuencia de muestreo de la señal [Hz]
@@ -30,11 +32,9 @@ def generador_senoidal (fs, f0, N, a0=1, p0=0):
     tt = np.linspace(0, (N-1)/fs, N)
     signal = a0*np.sin(2*np.pi*f0*tt + p0)
     
-    # fin de la función
-    
     return tt, signal
 
-def generador_ruido (fs, N, u, v):
+def generador_ruido (fs, N, mean, variance):
     """ 
     
     brief:  Generador de ruido, con argumentos
@@ -51,14 +51,20 @@ def generador_ruido (fs, N, u, v):
     """
     # vector de tiempos
     tt = np.linspace(0, (N-1)/fs, N)
-        
+    signal = np.random.normal(mean, np.sqrt(variance), N)  #normal recibe el desvio, no la varianza
+    
+    return tt, signal     
 
-
-def testbench ():
+def generador_cuadrada (a0, N, d):
+    
+    signal = np.concatenate((a0*np.ones(int(np.round(N*d))),-a0*np.ones(int(np.round(N*(1-d))))))
+    return signal
+#%%  Testbench de senoidales    
+def testbench_senoidal ():
     
     N  = 1000 # muestras
     fs = 1000 # Hz
-    
+
     ##################
     # a.1) Senoidal #
     #################
@@ -69,24 +75,6 @@ def testbench ():
 
     tiempo, señal = generador_senoidal(fs, f0, N, a0, p0)
     grafico = plt.plot(tiempo, señal, label = str(f0) + " Hz" )
-    plt.title('Señal: senoidal')
-    plt.xlabel('Tiempo [segundos]')
-    plt.ylabel('Amplitud [V]')
-    axes_hdl = plt.gca()    # Tomo el objeto axes (Lugar donde se grafica)
-    axes_hdl.legend(loc='upper right')
-
-# Prueba sin interpolar los puntos    
-#    a0 = 1 # Volts
-#    p0 = 0 # radianes
-#    f0 = 600   # Hz    
-#    
-#    tiempo, señal = generador_senoidal(fs, f0, N, a0, p0)
-#    grafico = plt.plot(tiempo, señal, 'r+', label = str(f0) + " Hz" )
-#    plt.title('Señal: senoidal')
-#    plt.xlabel('Tiempo [segundos]')
-#    plt.ylabel('Amplitud [V]')
-#    axes_hdl = plt.gca()    # Tomo el objeto axes (Lugar donde se grafica)
-#    axes_hdl.legend(loc='upper right')
     
     ##################
     # a.2) Senoidal #
@@ -110,9 +98,46 @@ def testbench ():
     tiempo, señal = generador_senoidal(fs, f0, N, a0, p0)
     plt.plot(tiempo, señal, label = str(f0) + " Hz" )
     
+    # Label del ploteo   
+    plt.title('Señal: senoidal')
+    plt.xlabel('Tiempo [segundos]')
+    plt.ylabel('Amplitud [V]')
+    plt.xlim((-0.05,1.05))
+    plt.ylim((-1.1,1.1))
     # Escribo la leyenda
     axes_hdl = plt.gca()    # Tomo el objeto axes (Lugar donde se grafica)
     axes_hdl.legend(loc='upper right')
 
+#%%  Testbench de ruido
 
-testbench()
+def testbench_ruido():
+    
+    N  = 1000 # muestras
+    fs = 1000 # Hz
+    
+    mean = 0
+    variance = 1
+    
+    tiempo, señal = generador_ruido(fs, N, mean, variance)
+    grafico = plt.plot(tiempo, señal, label = '$\sigma^2$ = ' + str(variance) + ' - $\hat{{\sigma}}^2$ :{0:.3f}'.format(np.var(señal)))
+    
+    
+    # Label del ploteo   
+    plt.title('Señal: ruido gaussiano')
+    plt.xlabel('Tiempo [segundos]')
+    plt.ylabel('Amplitud [V]')
+    # Escribo la leyenda
+    axes_hdl = plt.gca()    # Tomo el objeto axes (Lugar donde se grafica)
+    axes_hdl.legend(loc='upper right')
+
+#%%  Testbench cuadrada
+
+def testbench_cuadrada():
+    
+    N = 1000
+    d = 0.22
+    plt.plot(generador_cuadrada(1,N,d))
+#%%  Seleccione el testbench que se quiere probar
+#testbench_senoidal()
+#testbench_ruido()
+testbench_cuadrada()
