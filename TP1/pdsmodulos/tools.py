@@ -36,7 +36,7 @@ def spectrum_analyzer(x, fs, N, plot = True):
         plt.figure()
         plt.xlabel('f')
         plt.title('Espectro en frecuencia')
-        plt.plot(ff[0:(N//2+1)], 2.0/N * np.abs(y[0:(N//2+1)]))
+        plt.stem(ff[0:int(N//2+1)], 2.0/N * np.abs(y[0:int(N//2+1)]))
         plt.xlabel('Frecuencia [Hz]')
         plt.ylabel('Magnitud [V]')
         plt.grid()

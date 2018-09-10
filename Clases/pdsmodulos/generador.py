@@ -69,10 +69,20 @@ def generador_ruido (fs, N, mean = 0, variance = 0, high = 0, low = 0, left = -1
     
     return tt, signal      
 
-def generador_cuadrada (a0, N, d):
+def generador_cuadrada (a0, f0 , fs, N, d):
     
-    signal = np.concatenate((a0*np.ones(int(np.round(N*d))),-a0*np.ones(int(np.round(N*(1-d))))))
-    return signal
+    tt = np.linspace(0, (N-1)/fs, N)
+    
+    periodos = int(f0*N/fs)
+    
+    signal = np.array([], dtype=np.float).reshape(0,1)
+    
+    for i in range(periodos):
+        
+        aux = np.concatenate((a0*np.ones(int(np.round(N/periodos*d))),-a0*np.ones(int(np.round(N/periodos*(1-d))))))
+        signal = np.vstack([signal, aux.reshape(int(N/periodos),1)])
+        
+    return signal.reshape(N,)
 
 def generador_triangular (amin, amax, N, d, fs):
     

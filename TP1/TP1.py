@@ -179,5 +179,5 @@ def testbench_triangular():
 #%%  Seleccione el testbench que se quiere probar
 #testbench_senoidal()
 #testbench_ruido()
-#testbench_cuadrada()
-testbench_triangular()
+testbench_cuadrada()
+#testbench_triangular()
