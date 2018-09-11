@@ -31,7 +31,7 @@ def generador_senoidal (fs, f0, N, a0=1, p0=0):
     
     # vector de tiempos
     tt = np.linspace(0, (N-1)/fs, N)
-    signal = a0*np.sin(2*np.pi*f0*tt + p0)
+    signal = a0*np.sin(2*np.pi*f0*tt + p0, dtype = 'double')
     
     return tt, signal
 

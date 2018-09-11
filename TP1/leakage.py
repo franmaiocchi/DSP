@@ -21,15 +21,17 @@ def leakage_testbench():
     resto_frecuencias = []
     frecuencia = 0
     
+    df = fs/N
+    ff = np.linspace(0, int((N-1)*df), int(N))
+    
     for i in range(len(fd)):
         resto_frecuencias.append(0)
     
     for freq_offset in fd:
         tt, signal = gen.generador_senoidal(fs, f0 + freq_offset, N)
-        ff, spectrum = tools.spectrum_analyzer(signal, fs, N)
+        spectrum = tools.spectrum_analyzer(signal, fs, N)
         resultados = np.hstack([resultados, spectrum.reshape(N,1)])
     
-    df = ff[1]
     m_f0 = int((f0)/df)
     
 #    print(2.0/N *np.abs(resultados[m_f0,0]))

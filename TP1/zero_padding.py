@@ -17,7 +17,6 @@ def zero_padding_testbench():
     N = 1000    # Cantidad de muestras
     resultados = []
     frecuencias = []
-
     
     M = (0, N/10, N, 10*N) # Cantidad de ceros que se agregan
     
@@ -26,8 +25,10 @@ def zero_padding_testbench():
     f0 = fs/4 + fd[2] # Frecuencia de la señal
     
     for zero_padding in M:
+        df = fs/(N + zero_padding)
+        ff = np.linspace(0, int(((N + zero_padding)-1)*df), int(N + zero_padding))
         tt, signal = gen.generador_senoidal(fs, f0, N + zero_padding)
-        ff, spectrum = tools.spectrum_analyzer(signal, fs, N + zero_padding, plot = False)
+        spectrum = tools.spectrum_analyzer(signal, fs, N + zero_padding, plot = False)
         resultados.append(2.0/(N + zero_padding) * np.abs(spectrum[0:int((N + zero_padding)//2+1)]))
         frecuencias.append(ff[0:int((N + zero_padding)//2+1)])
     
