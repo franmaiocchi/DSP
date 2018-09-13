@@ -40,12 +40,34 @@ def signal_2():
     tt, signal = gen.generador_senoidal(fs, f0, N)
     signal[int(fs/f0):] = 0
     plt.plot(tt, signal)
+    spectrum = tools.spectrum_analyzer(signal, fs, N)
+    
+    energia_total = tools.energy(spectrum)
+    energia_f0 = pow(2.0/N * np.abs(spectrum[m_f0]),2)
+    
+    print('La energia total es ' + str(energia_total))
+    print('La energia en f0 es ' + str(energia_f0))   
     
     
 def signal_3():
     
     fs = 1000
     N = 1000
+    f0 = 9*fs/N
+    
+    m_f0 = int(N*(f0)/fs)
+    
+    tt, signal = gen.generador_senoidal(fs, f0, N)
+    signal[:int(2*fs/f0)+1] = 0
+    signal[int(3*fs/f0):] = 0
+    plt.plot(tt, signal)
+    spectrum = tools.spectrum_analyzer(signal, fs, N)
+    
+    energia_total = tools.energy(spectrum)
+    energia_f0 = pow(2.0/N * np.abs(spectrum[m_f0]),2)
+    
+    print('La energia total es ' + str(energia_total))
+    print('La energia en f0 es ' + str(energia_f0))  
     
 def signal_4():
  

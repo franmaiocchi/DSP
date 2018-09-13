@@ -58,14 +58,27 @@ def quantizer(x, b, rango):
     """ 
     # Saturacion
     signal = np.copy(x) # Sin esto, se modifica la señal pasada por parametro
-    i = np.where(np.abs(signal) >= rango/2)
-    signal[i] = np.round(signal[i])*rango/2
+    i = np.where(np.abs(signal) > rango/2)
+    signal[i] = np.sign(signal[i])*rango/2
     
-    k = pow(2, b - 1) -1
-    cuentas = np.round(signal*k/(rango/2))
-    signal_q = cuentas*((rango/2)/k)
+    print(i)
+    
+    Q = pow(2, b - 1) -1
+    cuentas = np.round(signal*Q/(rango/2))
+    signal_q = cuentas*((rango/2)/Q)
     
     return signal_q
+
+def quantizer_2(x, b):
+    
+    signal = np.copy(x)
+    signal = signal / np.max(np.abs(signal))
+    
+    s_real = signal*(pow(2, b-1)-1)
+    s_q = np.round(s_real)
+    
+    return s_q, s_real
+    
 
 def energy(x, domain = 'frequency'):
 
