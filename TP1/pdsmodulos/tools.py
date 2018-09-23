@@ -78,10 +78,9 @@ def quantizer_2(x, b):
     s_q = np.round(s_real)
     
     return s_q, s_real
-    
 
 def energy(x, domain = 'frequency'):
-
+    
     """ 
     
     brief:  Calcula la energia de la señal
@@ -92,12 +91,18 @@ def energy(x, domain = 'frequency'):
     
     energy:   Energia de la señal
     """ 
+    energy = 0
+    N = np.shape(x)[0]
     if domain == 'frequency':
-        energy = 0
-        N = np.shape(x)[0] 
         for bin in x[0:int(N//2+1)]:
-            energy = energy + pow(2.0/N * np.abs(bin),2)
+            energy = energy + pow(2.0/N * np.abs(bin), 2)/2
+    if domain == 'time':
+        for s in x:
+            energy = energy + pow(s, 2)/N
 
-    
     return energy
+
+def rms(x):
+    return np.sqrt(np.mean(np.square(x)))
+    
     

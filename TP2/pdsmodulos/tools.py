@@ -100,4 +100,31 @@ def energy(x, domain = 'frequency'):
 
     
     return energy
+
+def energy_2(x, domain = 'frequency'):
+    
+    """ 
+    
+    brief:  Calcula la energia de la señal
+    
+    x:          Señal 
+    
+    como resultado la señal devuelve:
+    
+    energy:   Energia de la señal
+    """ 
+    energy = 0
+    N = np.shape(x)[0]
+    if domain == 'frequency':
+        for bin in x[0:int(N//2+1)]:
+            energy = energy + pow(2.0/N * np.abs(bin), 2)/2
+    if domain == 'time':
+        for s in x:
+            energy = energy + pow(s, 2)/N
+
+    return energy
+
+def rms(x):
+    return np.sqrt(np.mean(np.square(x)))
+    
     

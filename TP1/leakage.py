@@ -16,7 +16,7 @@ def leakage_testbench():
     fd=(0, 0.01, 0.25, 0.5)
     N  = 1000 # muestras
     fs = 1000 # Hz
-    f0 = 40
+    f0 = fs/4
     resultados = np.array([], dtype=np.float).reshape(N,0)
     resto_frecuencias = []
     frecuencia = 0
