@@ -703,10 +703,173 @@ def signal_prueba2():
 #    print('La energia total es ' + str(energia_total))
 #    print('La energia en f0 es ' + str(energia_f0))   
 
+def prueba_fase():
+    
+    fs = 1000
+    N = 1000
+    f01 = 9*fs/N
+    f02 = 8*fs/N
+    a0 = np.sqrt(2)
+    
+    df = fs/N
+    ff = np.linspace(0, int((N-1)*df), int(N))
+    
+    m_f01 = int(N*(f01)/fs)
+    
+    tt, sen1 = gen.generador_senoidal(fs, f01, int(N/4), a0)
+    sen1[int(fs/f01):] = 0
+    tt, sen2 = gen.generador_senoidal(fs, f02, int(3*N/4), a0)
+    sen2[int(fs/f02):] = 0
+    
+    signal = np.concatenate((sen1, sen2))
+    tt = np.linspace(0, (N-1)/fs, N)
+
+    
+    plt.figure(figsize = (12, 12))
+    
+    spectrum = tools.spectrum_analyzer(signal, fs, N, plot = False)
+    
+    plt.subplot(2,1,1)
+    plt.stem(ff[0:int(N//2+1)], np.arctan2(np.imag(spectrum[0:int(N//2+1)]),np.real(spectrum[0:int(N//2+1)])))
+    plt.xlabel('Frecuencia [Hz]')
+    plt.xlim((5,10))
+    plt.grid()
+    plt.ylabel('Fase [rad]')
+    plt.title('Fase de la señal')
+    
+    tt, sen1 = gen.generador_senoidal(fs, f02, int(N/4), a0)
+    sen1[int(fs/f01):] = 0
+    tt, sen2 = gen.generador_senoidal(fs, f01, int(3*N/4), a0)
+    sen2[int(fs/f02):] = 0
+    
+    signal = np.concatenate((sen1, sen2))
+    tt = np.linspace(0, (N-1)/fs, N)
+    
+    spectrum = tools.spectrum_analyzer(signal, fs, N, plot = False)
+    
+    plt.subplot(2,1,2)
+    plt.stem(ff[0:int(N//2+1)], np.arctan2(np.imag(spectrum[0:int(N//2+1)]),np.real(spectrum[0:int(N//2+1)])))
+    plt.xlabel('Frecuencia [Hz]')
+    plt.xlim((5,10))
+    plt.grid()
+    plt.ylabel('Fase [rad]')
+    plt.title('Fase de la señal')
+
+def prueba_fase_cuadradas():
+    
+    fs = 1000
+    N = 1000
+    f01 = 9*fs/N
+    f02 = 8*fs/N
+    a0 = np.sqrt(2)
+    
+    df = fs/N
+    ff = np.linspace(0, int((N-1)*df), int(N))
+    
+    m_f01 = int(N*(f02)/fs)
+    
+    cuad1 = np.ones(N)
+    cuad1[int(fs/f02):] = 0
+    
+    cuad2 = np.ones(N)
+    cuad2[:int(fs/f01)] = 0
+    cuad2[int(2*fs/f01):] = 0
+
+    tt = np.linspace(0, (N-1)/fs, N)
+
+    plt.figure(figsize = (12, 12))
+    plt.subplot(2,1,1)
+    plt.plot(tt, cuad1)
+    plt.xlabel('Tiempo [seg]')
+    plt.grid()
+    plt.ylabel('Amplitud [V]')
+    plt.title('Cuadrada 1')
+    
+    plt.subplot(2,1,2)
+    plt.plot(tt, cuad2)
+    plt.xlabel('Tiempo [seg]')
+    plt.grid()
+    plt.ylabel('Amplitud [V]')
+    plt.title('Cuadrada 2')
+    
+    spectrum1 = tools.spectrum_analyzer(cuad1, fs, N, plot = False)
+    spectrum2 = tools.spectrum_analyzer(cuad2, fs, N, plot = False)
+    
+    plt.figure(figsize = (12, 12))
+    plt.subplot(2,1,1)
+    plt.stem(ff[0:int(N//2+1)], np.arctan2(np.imag(spectrum1[0:int(N//2+1)]),np.real(spectrum1[0:int(N//2+1)])))
+    plt.xlabel('Frecuencia [Hz]')
+#    plt.xlim((0,10))
+    plt.grid()
+    plt.ylabel('Fase [rad]')
+    plt.title('Fase de la señal')
+    
+    plt.subplot(2,1,2)
+    plt.stem(ff[0:int(N//2+1)], np.arctan2(np.imag(spectrum2[0:int(N//2+1)]),np.real(spectrum2[0:int(N//2+1)])))
+    plt.xlabel('Frecuencia [Hz]')
+#    plt.xlim((0,10))
+    plt.grid()
+    plt.ylabel('Fase [rad]')
+    plt.title('Fase de la señal')
+
+def prueba():
+
+    fs = 1000
+    N = 1000
+    f01 = 9*fs/N
+    f02 = 8*fs/N
+    a0 = np.sqrt(2)
+    
+    df = fs/N
+    ff = np.linspace(0, int((N-1)*df), int(N))
+    
+    tt, sen1 = gen.generador_senoidal(fs, f01, int(N/4), a0)
+    sen1[int(fs/f01):] = 0
+    tt, sen2 = gen.generador_senoidal(fs, f02, int(3*N/4), a0)
+    sen2[int(fs/f02):] = 0
+    
+    signal1 = np.concatenate((sen1, sen2))
+    
+    tt, sen1 = gen.generador_senoidal(fs, f02, int(N/4), a0)
+    sen1[int(fs/f02):] = 0
+    tt, sen2 = gen.generador_senoidal(fs, f01, int(3*N/4), a0)
+    sen2[int(fs/f01):] = 0
+    
+    signal2 = np.concatenate((sen1, sen2))
+    
+    spectrum1 = tools.spectrum_analyzer(signal1, fs, N, plot = False)
+    spectrum2 = tools.spectrum_analyzer(signal2, fs, N, plot = False)
+    
+    tt = np.linspace(0, (N-1)/fs, N)
+    
+    plt.subplot(2,1,1)
+    plt.plot(tt, signal1)
+    plt.subplot(2,1,2)
+    plt.plot(tt, signal2)
+    
+
+    plt.figure(figsize = (12, 12))
+    plt.subplot(2,1,1)
+    plt.title("Senoidal de " + str(f01) + ' Hz y ' + str(f02) + ' Hz')
+    plt.stem(ff[0:int(N//2+1)], np.arctan2(np.imag(spectrum1[0:int(N//2+1)]),np.real(spectrum1[0:int(N//2+1)])))
+    plt.xlabel('Frecuencia [Hz]')
+    plt.xlim((0,20))
+    plt.grid()
+    plt.ylabel('Fase [rad]')
+
+    
+    plt.subplot(2,1,2)
+    plt.stem(ff[0:int(N//2+1)], np.arctan2(np.imag(spectrum2[0:int(N//2+1)]),np.real(spectrum2[0:int(N//2+1)])))
+    plt.xlabel('Frecuencia [Hz]')
+    plt.xlim((0,20))
+    plt.grid()
+    plt.ylabel('Fase [rad]')
+    plt.title("Senoidal de " + str(f02) + ' Hz y ' + str(f01) + ' Hz')
+
 #signal_1()
 #signal_2()
 #signal_3()
-signal_4()
+#signal_4()
 #signal_5()
 #signal_6()
 #signal_7()
@@ -714,3 +877,6 @@ signal_4()
 #signal_9()
 #signal_prueba1()
 #signal_prueba2()
+#prueba_fase()
+#prueba_fase_cuadradas()
+prueba()
