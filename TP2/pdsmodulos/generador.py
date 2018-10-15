@@ -33,7 +33,7 @@ def generador_senoidal (fs, f0, N, a0=1, p0=0):
     tt = np.linspace(0, (N-1)/fs, N)
     signal = a0*np.sin(2*np.pi*f0*tt + p0, dtype = 'double')
     
-    return tt, signal
+    return signal
 
 def generador_ruido (fs, N, mean = 0, variance = 0, high = 0, low = 0, left = -1, right = 1, peak = 0,  distribution = 'Normal'):
     """ 
