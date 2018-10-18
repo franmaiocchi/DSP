@@ -13,8 +13,8 @@ import pdsmodulos.tools as tools
 
 def testbench():
     
-    fs = 1024
-    N = 1024
+    fs = 1000
+    N = 1000
     
     a1 = 1
     a2 = pow(10, -2)*a1
@@ -25,7 +25,7 @@ def testbench():
     tt = np.linspace(0, (N-1)/fs, N)
     
     f01 = fs/4
-    f02 = f01 + 10*fs/(2*N)
+    f02 = f01 + 10*fs/(N)
     
     print("La frecuencia 1 es" + str(f01) + " y la frecuencia 2 es " + str(f02))
     
@@ -58,7 +58,7 @@ def testbench():
     plt.plot(ff[0:int(N//2+1)], 20*np.log10(2.0/N * np.abs(spectrum[0:int(N//2+1)]) + np.finfo(float).eps))
     plt.xlabel('Frecuencia [Hz]')
     plt.ylabel('Magnitud [V]')
-    plt.xlim((156,356))
+#    plt.xlim((156,356))
     plt.grid()
     plt.suptitle("Ejercicio 2b - Cuantizado")
     
@@ -78,7 +78,7 @@ def testbench():
         plt.xlim((156,356))
         plt.grid()
         plt.suptitle("Frecuencia del tono principal de " + str(f01+freq_offset) + " Hz")        
-  
+#  
     bartlett = np.bartlett(N)
     blackman = np.blackman(N)
     hamming = np.hamming(N)
@@ -101,3 +101,4 @@ def testbench():
         
     
 testbench()
+

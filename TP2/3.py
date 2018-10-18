@@ -29,13 +29,14 @@ def testbench():
     
     tt, fr = gen.generador_ruido(fs, 200, low = -2, high = 2, distribution = 'Uniform')
     
-    window = signal.flattop(N)
+#    window = signal.flattop(N)
     
     for freq in fr:
     
         f1 = f0 + freq*df
         sig = gen.generador_senoidal(fs, f1, N, a0)
-        spectrum = tools.spectrum_analyzer(sig*window, fs, N, plot = False)
+#        spectrum = tools.spectrum_analyzer(sig*window, fs, N, plot = False)
+        spectrum = tools.spectrum_analyzer(sig, fs, N, plot = False)
         estimador_a0.append(np.abs(2.0/N * spectrum[m_f0]))
         estimador_a1.append(tools.rms(2.0/N * np.abs(spectrum[a:b])))
         
