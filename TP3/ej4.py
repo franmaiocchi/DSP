@@ -23,13 +23,14 @@ def barlett(N):
 def testbench():
     
     fs = 1000
-    R = 1
+    R = 5       # Cantidad de realizaciones
     K = 10      # Cantidad de bloques
     N = 1000    # Cantidad de muestras 
     overlap = 50    # Overlap en %
     L = int(N/K)    # Cantidad de muestras por bloque
     D = int(L * overlap/100) # Offset de los bloques
     cant_promedios = 1 + int((N-L)/D)   # Cantidad de promedios realizados
+    freqs = np.array([], dtype=np.float).reshape(R,0)
     
     df = fs/L
     ff = np.linspace(0, ((L-1)*df), int(L))
@@ -37,34 +38,49 @@ def testbench():
     f0 = fs/4
     a1 = 2
     
+    SNR = np.array([3, 10], dtype=np.float)
+    
     mean = 0
-    variance = 20
     
     window = barlett(L)
     window = window/LA.norm(window)
     
-    for i in range(R):
+    for snr in SNR:
         
-        fr = gen.generador_ruido(fs, N, low = -1/2, high = 1/2, distribution = 'Uniform')
-        noise = np.random.normal(mean, np.sqrt(variance), N)
-        
-        f1 = f0 + fr
-        
-        signal = gen.generador_senoidal(fs, f1, N, a1) + noise
+        variance = pow(a1, 2)*pow(10, (-snr)/10)/2
+        aux = np.array([], dtype = np.float)
     
-        n1 = 0
-        psd_average = 0
-        for i in range(cant_promedios):
-            noise_spectrum = fft(signal[n1:(n1+L)]*window, axis = 0)
-            psd = pow((1/L)*np.abs(noise_spectrum), 2)
-            psd_average = psd_average + psd/cant_promedios
-            n1 = n1 + D
+        for i in range(R):
             
-        psd_average = psd_average*L # NO TENGO IDEA DE DONDE SALE ESTE *L
+            fr = gen.generador_ruido(fs, N, low = -1/2, high = 1/2, distribution = 'Uniform')
+            noise = gen.generador_ruido(fs, N, mean, variance, distribution = 'Normal')
+            
+            f1 = f0 + fr
+            
+            signal = gen.generador_senoidal(fs, f1, N, a1) + noise
         
-        plt.figure()
-        plt.stem(ff[0:int(L//2+1)], psd_average[0:int(L//2+1)])
+            n1 = 0
+            psd_average = 0
+            for i in range(cant_promedios):
+                noise_spectrum = fft(signal[n1:(n1+L)]*window, axis = 0)
+                psd = pow((1/L)*np.abs(noise_spectrum), 2)
+                psd_average = psd_average + psd/cant_promedios
+                n1 = n1 + D
+                
+            psd_average = psd_average*L # NO TENGO IDEA DE DONDE SALE ESTE *L
+            
+            indice = np.where(psd_average[0:int(L//2+1)] == np.max(psd_average))
+            aux = np.append(aux, ff[indice])
+            
+            
+    #        plt.figure()
+    #        plt.stem(ff[0:int(L//2+1)], psd_average[0:int(L//2+1)])
+        freqs = np.hstack([freqs, aux.reshape(R,1)] )
+    var = np.var(freqs, axis = 0)
     
-
+    print("La varianza con SNR 3dB es: " + str(var[0]))
+    print("La varianza con SNR 10dB es: " + str(var[1]))
+    
+    
     
 testbench()

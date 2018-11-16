@@ -24,10 +24,12 @@ def testbench():
     ff = np.linspace(0, ((N-1)*df), int(N))
     
     f0 = fs/4
-    a1 = 2
+    a1 = np.sqrt(2)
+    
+    att = -3
     
     mean = 0
-    variance = 316
+    variance = pow(a1, 2)*pow(10, att/10)/2
     
     for i in range(R):
         
@@ -36,7 +38,7 @@ def testbench():
         
         f1 = f0
   
-        signal = gen.generador_senoidal(fs, f1, N, a1) 
+        signal = gen.generador_senoidal(fs, f1, N, a1) + noise
     
         spectrum = fft(signal, axis = 0)
         psd = pow((1/N)*np.abs(spectrum), 2)
