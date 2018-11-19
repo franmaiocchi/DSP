@@ -74,17 +74,6 @@ def testbench():
     
     x = ecg_one_lead - b
     
-#    plt.figure()
-#    plt.plot(qrs_pattern1)
-#    plt.figure()
-#    plt.plot(heartbeat_pattern1)
-#    plt.figure()
-#    plt.plot(heartbeat_pattern2)
-#    plt.figure()
-#    plt.plot(qrs_detections)
-    
-    
-    
     for ii in zonas_con_interf_baja_frec:
     
         # intervalo limitado de 0 a cant_muestras
