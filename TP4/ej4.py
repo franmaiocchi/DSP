@@ -56,55 +56,76 @@ def testbench():
     
     # Defina la plantilla del filtro
     
-    fs0 = 1     # fin de la banda de detenida 0
-    fc0 = 1.2     # comienzo de la banda de paso
+    fs0 = 1    # fin de la banda de detenida 0
+    fc0 = 2    # comienzo de la banda de paso
     fc1 = 20    # fin de la banda de paso
     fs1 = 40    # comienzo de la banda de detenida 1
     
     frecs = np.array([0.0, fs0, fc0, fc1, fs1, fs/2]) / (fs/2)
     
-    cant_coef = 4001
+    cant_coef = 2001
     
     # filter design
     ripple = 0.5 # dB
     atenuacion = 40 # dB
     
     gains = np.array([-atenuacion, -atenuacion, -ripple, -ripple, -atenuacion, -atenuacion])
+    gains2 = np.array([-atenuacion-10, -atenuacion-10, -2*ripple, -2*ripple, -atenuacion-20, -atenuacion-20])
     gains = 10**(gains/20)
-    num_win1 =   signal.firwin2(cant_coef, frecs, gains , window='blackmanharris' )
+    gains2 = 10**(gains2/20)
+    
+    num_fir1 = signal.firwin2(cant_coef, frecs, gains)
+    num_fir2 = signal.firwin2(cant_coef, frecs, gains2)
     butter = signal.iirdesign(wp=np.array([fc0, fc1]) / (fs/2), ws=np.array([fs0, fs1]) / (fs/2), gpass=0.5, gstop=40., analog=False, ftype='butter', output='sos')
+    cheby = signal.iirdesign(wp=np.array([fc0, fc1]) / (fs/2), ws=np.array([fs0, fs1]) / (fs/2), gpass=0.5, gstop=40., analog=False, ftype='cheby1', output='sos')
     
     # Esto sirve para plotear los filtros
-    w, fir1 = signal.freqz(num_win1, 1)
+    w, fir1 = signal.freqz(num_fir1, 1)
+    w, fir2 = signal.freqz(num_fir2, 1)
     w, h_butter = signal.sosfreqz(butter)
+    w, h_cheby = signal.sosfreqz(cheby)
 
     w = w / np.pi * (fs/2)
     
     plt.figure()
-    plt.plot(w, 20 * np.log10(abs(fir1)), label='FIR-Win')
+    plt.plot(w, 20 * np.log10(abs(fir1) + np.finfo(float).eps), label='FIR-1')
+    plt.plot(w, 20 * np.log10(abs(fir2) + np.finfo(float).eps), label='FIR-2')
+    plt.plot(w, 20*np.log10(np.abs(h_butter) + np.finfo(float).eps), label='IIR-Butter' )
+    plt.plot(w, 20*np.log10(np.abs(h_cheby) + np.finfo(float).eps), label='IIR-Cheby' )
+    plt.xlim(-5, 100)
+    plt.ylim(-80, 5)
+    plt.grid()
     
-    plt.figure()
-    plt.plot(w, 20*np.log10(np.abs(h_butter)), label='IIR-Butter' )
+    axes_hdl = plt.gca()
+    axes_hdl.legend()
     
-    ECG_f_win = signal.filtfilt(num_win1, 1, ecg_one_lead.reshape(N))
+    ECG_f_fir1 = signal.filtfilt(num_fir1, 1, ecg_one_lead.reshape(N))
+    ECG_f_fir2 = signal.filtfilt(num_fir2, 1, ecg_one_lead.reshape(N))
     ECG_f_butt = signal.sosfiltfilt(butter, ecg_one_lead.reshape(N))
+    ECG_f_cheby = signal.sosfiltfilt(cheby, ecg_one_lead.reshape(N))
     
-    # Segmentos de interés
-    regs_interes = ( 
+    zonas_con_interf_baja_frec = ( 
+        np.array([12, 12.4]) *60*fs, # minutos a muestras
+        np.array([15, 15.2]) *60*fs, # minutos a muestras
+        )
+
+    zonas_sin_interf = ( 
             np.array([5, 5.2]) *60*fs, # minutos a muestras
-            np.array([12, 12.4]) *60*fs, # minutos a muestras
-            np.array([15, 15.2]) *60*fs, # minutos a muestras
+            [4000, 5500], # muestras
+            [10e3, 11e3], # muestras
             )
     
-    for ii in regs_interes:
+    for ii in zonas_con_interf_baja_frec:
     
         # intervalo limitado de 0 a cant_muestras
         zoom_region = np.arange(np.max([0, ii[0]]), np.min([N, ii[1]]), dtype='uint')
         
         plt.figure()
         plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', lw=2)
-        plt.plot(zoom_region, ECG_f_win[zoom_region], label='Win')
+        plt.plot(zoom_region, ECG_f_fir1[zoom_region], label='Fir1')
+        plt.plot(zoom_region, ECG_f_fir2[zoom_region], label='Fir2')
         plt.plot(zoom_region, ECG_f_butt[zoom_region], label='Butter')
+        plt.plot(zoom_region, ECG_f_cheby[zoom_region], label='Cheby')
         
         plt.title('ECG filtering example from ' + str(ii[0]) + ' to ' + str(ii[1]) )
         plt.ylabel('Adimensional')
@@ -113,7 +134,27 @@ def testbench():
         axes_hdl = plt.gca()
         axes_hdl.legend()
         axes_hdl.set_yticks(())
-                
-        plt.show()
+        plt.grid()
+        
+    for ii in zonas_sin_interf:
+    
+        # intervalo limitado de 0 a cant_muestras
+        zoom_region = np.arange(np.max([0, ii[0]]), np.min([N, ii[1]]), dtype='uint')
+        
+        plt.figure()
+        plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', lw=2)
+        plt.plot(zoom_region, ECG_f_fir1[zoom_region], label='Fir1')
+        plt.plot(zoom_region, ECG_f_fir2[zoom_region], label='Fir2')
+        plt.plot(zoom_region, ECG_f_butt[zoom_region], label='Butter')
+        plt.plot(zoom_region, ECG_f_cheby[zoom_region], label='Cheby')
+        
+        plt.title('ECG filtering example from ' + str(ii[0]) + ' to ' + str(ii[1]) )
+        plt.ylabel('Adimensional')
+        plt.xlabel('Muestras (#)')
+        plt.grid()
+        
+        axes_hdl = plt.gca()
+        axes_hdl.legend()
+        axes_hdl.set_yticks(())
 
 testbench()

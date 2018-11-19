@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed Nov 14 20:46:58 2018
+Created on Mon Nov 19 11:11:08 2018
 
 @author: Francisco
 """
@@ -13,6 +13,7 @@ import pdsmodulos.tools as tools
 from scipy import signal
 from scipy.fftpack import fft
 import scipy.io as sio
+from scipy.interpolate import CubicSpline
 
 #%% Variables de ECG_TP4.mat
 
@@ -38,6 +39,13 @@ def testbench():
     N = len(ecg_one_lead)
     ecg_one_lead = ecg_one_lead.reshape(N)
     
+    qrs_pattern1 = vertical_flaten(mat_struct['qrs_pattern1'])
+    heartbeat_pattern1 = vertical_flaten(mat_struct['heartbeat_pattern1'])
+    heartbeat_pattern2 = vertical_flaten(mat_struct['heartbeat_pattern2'])
+    qrs_detections = vertical_flaten(mat_struct['qrs_detections'])
+    nivel_isoelectrico = qrs_detections - 68
+    nivel_isoelectrico = nivel_isoelectrico.reshape(len(nivel_isoelectrico))
+    
     df = fs/N
     ff = np.linspace(0, int((N-1)*df), int(N))
     
@@ -53,42 +61,29 @@ def testbench():
             [10e3, 11e3], # muestras
             )
     
-##    Segmentos de interés
-#    regs_interes = ( 
-#            np.array([5, 5.2]) *60*fs, # minutos a muestras
-#            np.array([12, 12.4]) *60*fs, # minutos a muestras
-#            np.array([15, 15.2]) *60*fs, # minutos a muestras
-#            )
+    plt.figure()
+#    plt.plot(ecg_one_lead, '-gD', markevery = nivel_isoelectrico.all())
+    plt.plot(ecg_one_lead)
+    plt.plot(nivel_isoelectrico, ecg_one_lead[nivel_isoelectrico], 'rx', markersize = 20, markeredgewidth = 4)
+    plt.vlines(qrs_detections, ymin = -33000, ymax = 33000, color = 'r', linestyles = 'dashed')
     
-    b = signal.medfilt(signal.medfilt(ecg_one_lead, 199), 599)
+    b = CubicSpline(nivel_isoelectrico, ecg_one_lead[nivel_isoelectrico])
+    b = b(range(N))
+    plt.figure()
+    plt.plot(b)
+    
     x = ecg_one_lead - b
     
-    spectrum = fft(b)
-    psd = pow((1/N)*np.abs(spectrum), 2)
+#    plt.figure()
+#    plt.plot(qrs_pattern1)
+#    plt.figure()
+#    plt.plot(heartbeat_pattern1)
+#    plt.figure()
+#    plt.plot(heartbeat_pattern2)
+#    plt.figure()
+#    plt.plot(qrs_detections)
     
-    plt.figure()
-    plt.plot(ff[0:int(N//2+1)], psd[0:int(N//2+1)])
     
-#    for ii in regs_interes:
-#    
-#        # intervalo limitado de 0 a cant_muestras
-#        zoom_region = np.arange(np.max([0, ii[0]]), np.min([N, ii[1]]), dtype='uint')
-#        
-#        plt.figure()
-#        plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', lw=2)
-#        plt.plot(zoom_region, x[zoom_region], label = 'ECG Filtrado')
-##        plt.plot(zoom_region, ECG_f_win[zoom_region], label='Win')
-##        plt.plot(zoom_region, ECG_f_butt[zoom_region], label='Butter')
-#        
-#        plt.title('ECG filtering example from ' + str(ii[0]) + ' to ' + str(ii[1]) )
-#        plt.ylabel('Adimensional')
-#        plt.xlabel('Muestras (#)')
-#        
-#        axes_hdl = plt.gca()
-#        axes_hdl.legend()
-#        axes_hdl.set_yticks(())
-#                
-#        plt.show()
     
     for ii in zonas_con_interf_baja_frec:
     
@@ -109,8 +104,6 @@ def testbench():
         axes_hdl = plt.gca()
         axes_hdl.legend()
         axes_hdl.set_yticks(())
-                
-        plt.show()
         
     for ii in zonas_sin_interf:
     
@@ -131,8 +124,5 @@ def testbench():
         axes_hdl = plt.gca()
         axes_hdl.legend()
         axes_hdl.set_yticks(())
-                
-        plt.show()
 
 testbench()
-    
