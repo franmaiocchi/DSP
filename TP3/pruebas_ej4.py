@@ -24,13 +24,13 @@ def testbench():
     ff = np.linspace(0, ((N-1)*df), int(N))
     
     f0 = fs/4
-    a1 = np.sqrt(2)
+    a1 = 1
     
     att = -3
     
     mean = 0
-    variance = pow(a1, 2)*pow(10, att/10)/2
-    
+    variance = ((a1**2)/2)*10**(att/10)*N    
+#    variance = 2
     for i in range(R):
         
         fr = gen.generador_ruido(fs, N, low = -1/2, high = 1/2, distribution = 'Uniform')
@@ -44,7 +44,9 @@ def testbench():
         psd = pow((1/N)*np.abs(spectrum), 2)
         
         plt.figure()
-        plt.stem(ff[0:int(N//2+1)], psd[0:int(N//2+1)])
+        plt.plot(ff[0:int(N//2+1)], 10*np.log10(np.abs(psd[0:int(N//2+1)])/np.max((psd))))
+#        plt.plot(ff[0:int(N//2+1)], 10*np.log10(np.abs(spectrum[0:int(N//2+1)])/np.max(np.abs(spectrum))))
+        plt.grid()
     
 
     
