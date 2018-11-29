@@ -82,15 +82,41 @@ def testbench():
             aux2 = np.append(aux2, ff[indice])
             
             
-            
-            
     #        plt.figure()
     #        plt.stem(ff[0:int(L//2+1)], psd_average[0:int(L//2+1)])
         freqs = np.hstack([freqs, aux.reshape(R,1)] )
         freqs_BT = np.hstack([freqs_BT, aux2.reshape(R,1)] )
-    plt.plot(freqs)
+        
     var = np.var(freqs, axis = 0)
     var_BT = np.var(freqs_BT, axis = 0)
+    
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.hist(freqs[:,0], bins=11)
+    plt.title("Histograma de welch con SNR: 3dB")
+    plt.xlabel("Frecuencia [Hz]")
+    plt.ylabel("Veces")
+    plt.grid()
+    plt.subplot(2,1,2)
+    plt.hist(freqs[:,1], bins=11)
+    plt.title("Histograma de welch con SNR: 10dB")
+    plt.xlabel("Frecuencia [Hz]")
+    plt.ylabel("Veces")
+    plt.grid()
+    
+    plt.figure()
+    plt.subplot(2,1,1)
+    plt.hist(freqs_BT[:,0], bins=11)
+    plt.title("Histograma de BT con SNR: 3dB")
+    plt.xlabel("Frecuencia [Hz]")
+    plt.ylabel("Veces")
+    plt.grid()
+    plt.subplot(2,1,2)
+    plt.hist(freqs_BT[:,1], bins=11)
+    plt.title("Histograma de BT con SNR: 10dB")
+    plt.xlabel("Frecuencia [Hz]")
+    plt.ylabel("Veces")
+    plt.grid()
     
     print("La varianza de welch con SNR 3dB es: " + str(var[0]))
     print("La varianza de welch con SNR 10dB es: " + str(var[1]))
