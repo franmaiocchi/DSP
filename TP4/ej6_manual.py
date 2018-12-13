@@ -49,15 +49,15 @@ def testbench():
     
     zoom_region = np.arange(5000, 12000, dtype='uint')
     
-    det = qrs_detections[6:13]
+    det = qrs_detections[6:14]
     
     reverse_hb_1 = hb_1[::-1]
     
     latidos = signal.lfilter((reverse_hb_1), 1.0, (ecg_one_lead[zoom_region]))
     neg = np.where(latidos < 0)
     latidos[neg] = 0
-    latidos = latidos*latidos
     latidos = latidos/np.max(latidos)
+    latidos = latidos*latidos
     picos, _ = signal.find_peaks(latidos, height = 0.2, distance = 250)
 
     
@@ -66,6 +66,7 @@ def testbench():
     plt.subplot(2,1,1)
     plt.plot(zoom_region, ecg_one_lead[zoom_region])
     plt.vlines(zoom_region[picos-peak_offset], ymin = -33000, ymax = 33000, color = 'r', linestyles = 'dashed')
+    plt.vlines(det, ymin = -33000, ymax = 33000, color = 'r', linestyles = 'dashed')
     plt.title("ECG")
     plt.ylabel('Adimensional')
     plt.grid()
